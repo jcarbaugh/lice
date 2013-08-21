@@ -1,4 +1,5 @@
 from lice.core import *
+from io import StringIO
 import os
 try:
     import unittest2 as unittest
@@ -23,62 +24,72 @@ class TestTemplates(unittest.TestCase):
 
     def test_file_template(self):
         pwd = os.path.abspath(os.path.dirname(__file__))
+        lang = "txt"
         for license in LICENSES:
             path = os.path.join(pwd, "template-%s.txt" % license)
             with open(path) as infile:
                 content = infile.read()
-                self.assertEqual(content, load_file_template(path))
+                self.assertNotEqual(content, load_file_template(path, lang))
 
     def test_package_template(self):
+        lang = "txt"
         pwd = os.path.abspath(os.path.dirname(__file__))
         for license in LICENSES:
             path = os.path.join(pwd, "template-%s.txt" % license)
             with open(path) as infile:
-                self.assertEqual(infile.read(), load_package_template(license))
+                self.assertNotEqual(infile.read(), load_package_template(license,
+                    lang))
 
     def test_extract_vars(self):
+        template = StringIO()
         for license in LICENSES:
-            template = """Oh hey, {{ this }} is a {{ template }} test."""
+            template.write(u'Oh hey, {{ this }} is a {{ template }} test.')
             var_list = extract_vars(template)
             self.assertEquals(var_list, ["template", "this"])
 
     def test_license(self):
 
+        lang = "txt"
         context = {
-            "year": "1981",
-            "project": "lice",
-            "organization": "Awesome Co.",
+            "year": u'1981',
+            "project": u'lice',
+            "organization": u'Awesome Co.'
         }
 
         for license in LICENSES:
 
-            template = load_package_template(license)
+            template = load_package_template(license, lang)
+            content = template.getvalue()
 
-            rendered = template.replace("{{ year }}", context["year"])
-            rendered = rendered.replace("{{ project }}", context["project"])
-            rendered = rendered.replace("{{ organization }}", context["organization"])
+            content = content.replace(u'{{ year }}', context["year"])
+            content = content.replace(u'{{ project }}', context["project"])
+            content = content.replace(u'{{ organization }}', context["organization"])
 
-            self.assertEqual(rendered, generate_license(template, context))
+            self.assertEqual(content, generate_license(template, context).getvalue())
+            template.close() # discard memory
 
     def test_license_header(self):
 
+        lang = "txt"
         context = {
-            "year": "1981",
-            "project": "lice",
-            "organization": "Awesome Co.",
+            "year": u'1981',
+            "project": u'lice',
+            "organization": u'Awesome Co.'
         }
 
         for license in LICENSES:
 
             try:
 
-                template = load_package_template(license, header=True)
+                template = load_package_template(license, lang, header=True)
+                content = template.getvalue()
 
-                rendered = template.replace("{{ year }}", context["year"])
-                rendered = rendered.replace("{{ project }}", context["project"])
-                rendered = rendered.replace("{{ organization }}", context["organization"])
+                content = content.replace(u'{{ year }}', context["year"])
+                content = content.replace(u'{{ project }}', context["project"])
+                content = content.replace(u'{{ organization }}', context["organization"])
 
-                self.assertEqual(rendered, generate_license(template, context))
+                self.assertEqual(content, generate_license(template, context).getvalue())
+                template.close() # discard memory
 
             except IOError:
                 pass  # it's okay to not find templates
