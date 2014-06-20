@@ -8,6 +8,14 @@ import subprocess
 import sys
 import getpass
 
+import sys
+if sys.version < '3':
+    def u(x):
+        return x.decode("UTF-8")
+else:
+    def u(x):
+        return x
+
 
 LICENSES = []
 for file in sorted(resource_listdir(__name__, '.')):
@@ -48,13 +56,13 @@ LANGS = {"txt": "text", "h": "c", "hpp": "c", "c": "c", "cc": "c", "cpp": "c",
         "hs": "haskell", "idr": "haskell", "clj": "lisp", "lisp": "lisp",
         "agda": "haskell", "ml": "ml", "el": "lisp", "php": "c"}
 
-LANG_CMT = {"text": [u'', u'', u''], "c": [u'/*', u' *', u' */'], "unix": [u'', u'#', u''],
-        "lua": [u'--[[', u'', u'--]]'], "java": [u'/**', u' *', u' */'],
-        "perl": [u'=item', u'', u'=cut'], "ruby": [u'=begin', u'', u'=end'],
-        "fortran": [u'C', u'C', u'C'], "fortran90": [u'!*', u'!*', u'!*'],
-        "erlang": [u'%%', u'%', u'%%'], "html": [u'<!--', u'', u'-->'],
-        "haskell": [u'{-', u'', u'-}'], "lisp": [u'', u';;', u''],
-        "ml": [u'(*', u'', u'*)']}
+LANG_CMT = {"text": [u(''), u(''), u('')], "c": [u('/*'), u(' *'), u(' */')], "unix": [u(''), u('#'), u('')],
+        "lua": [u('--[['), u(''), u('--]]')], "java": [u('/**'), u(' *'), u(' */')],
+        "perl": [u('=item'), u(''), u('=cut')], "ruby": [u('=begin'), u(''), u('=end')],
+        "fortran": [u('C'), u('C'), u('C')], "fortran90": [u('!*'), u('!*'), u('!*')],
+        "erlang": [u('%%'), u('%'), u('%%')], "html": [u('<!--'), u(''), u('-->')],
+        "haskell": [u('{-'), u(''), u('-}')], "lisp": [u(''), u(';;'), u('')],
+        "ml": [u('(*'), u(''), u('*)')]}
 
 
 def clean_path(p):
@@ -75,6 +83,8 @@ def get_context(args):
     }
 
 
+
+
 def guess_organization():
     """ Guess the organization from `git config`. If that can't be found,
         fall back to $USER environment variable.
@@ -84,7 +94,7 @@ def guess_organization():
         org = stdout.strip()
     except:
         org = getpass.getuser()
-    return org.decode("UTF-8")
+    return u(org)
 
 
 def load_file_template(path):
@@ -140,11 +150,11 @@ def format_license(template, lang):
     """
     out = StringIO()
     template.seek(0) # from the start of the buffer
-    out.write(LANG_CMT[LANGS[lang]][0] + u'\n')
+    out.write(LANG_CMT[LANGS[lang]][0] + u('\n'))
     for line in template.readlines():
-        out.write(LANG_CMT[LANGS[lang]][1] + u' ')
+        out.write(LANG_CMT[LANGS[lang]][1] + u(' '))
         out.write(line)
-    out.write(LANG_CMT[LANGS[lang]][2] + u'\n')
+    out.write(LANG_CMT[LANGS[lang]][2] + u('\n'))
     template.close() # force garbage collector
     return out
 
