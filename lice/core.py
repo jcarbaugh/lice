@@ -42,19 +42,19 @@ DEFAULT_LICENSE = "bsd3"
 
 
 LANGS = {"txt": "text", "h": "c", "hpp": "c", "c": "c", "cc": "c", "cpp": "c",
-        "py": "unix", "pl": "perl", "sh": "unix", "lua": "lua", "rb": "ruby",
-        "js": "c", "java": "java", "f": "fortran", "f90": "fortran90",
-        "erl": "erlang", "html": "html", "css": "c", "m": "c",
-        "hs": "haskell", "idr": "haskell", "clj": "lisp", "lisp": "lisp",
-        "agda": "haskell", "ml": "ml", "el": "lisp", "php": "c"}
+         "py": "unix", "pl": "perl", "sh": "unix", "lua": "lua", "rb": "ruby",
+         "js": "c", "java": "java", "f": "fortran", "f90": "fortran90",
+         "erl": "erlang", "html": "html", "css": "c", "m": "c",
+         "hs": "haskell", "idr": "haskell", "clj": "lisp", "lisp": "lisp",
+         "agda": "haskell", "ml": "ml", "el": "lisp", "php": "c"}
 
 LANG_CMT = {"text": [u'', u'', u''], "c": [u'/*', u' *', u' */'], "unix": [u'', u'#', u''],
-        "lua": [u'--[[', u'', u'--]]'], "java": [u'/**', u' *', u' */'],
-        "perl": [u'=item', u'', u'=cut'], "ruby": [u'=begin', u'', u'=end'],
-        "fortran": [u'C', u'C', u'C'], "fortran90": [u'!*', u'!*', u'!*'],
-        "erlang": [u'%%', u'%', u'%%'], "html": [u'<!--', u'', u'-->'],
-        "haskell": [u'{-', u'', u'-}'], "lisp": [u'', u';;', u''],
-        "ml": [u'(*', u'', u'*)']}
+            "lua": [u'--[[', u'', u'--]]'], "java": [u'/**', u' *', u' */'],
+            "perl": [u'=item', u'', u'=cut'], "ruby": [u'=begin', u'', u'=end'],
+            "fortran": [u'C', u'C', u'C'], "fortran90": [u'!*', u'!*', u'!*'],
+            "erlang": [u'%%', u'%', u'%%'], "html": [u'<!--', u'', u'-->'],
+            "haskell": [u'{-', u'', u'-}'], "lisp": [u'', u';;', u''],
+            "ml": [u'(*', u'', u'*)']}
 
 
 def clean_path(p):
@@ -93,9 +93,9 @@ def load_file_template(path):
     template = StringIO()
     if not os.path.exists(path):
         raise ValueError("path does not exist: %s" % path)
-    with open(clean_path(path), "rb") as infile: # opened as binary
+    with open(clean_path(path), "rb") as infile:  # opened as binary
         for line in infile:
-            template.write(line.decode("utf-8")) # ensure utf-8
+            template.write(line.decode("utf-8"))  # ensure utf-8
     return template
 
 
@@ -106,7 +106,7 @@ def load_package_template(license, header=False):
     filename = 'template-%s-header.txt' if header else 'template-%s.txt'
     with resource_stream(__name__, filename % license) as licfile:
         for line in licfile:
-            content.write(line.decode("utf-8")) # write utf-8 string
+            content.write(line.decode("utf-8"))  # write utf-8 string
     return content
 
 
@@ -130,23 +130,25 @@ def generate_license(template, context):
         if key not in context:
             raise ValueError("%s is missing from the template context" % key)
         content = content.replace("{{ %s }}" % key, context[key])
-    template.close() # free template memory (when is garbage collected?)
+    template.close()  # free template memory (when is garbage collected?)
     out.write(content)
     return out
+
 
 def format_license(template, lang):
     """ Format the StringIO template object for specified lang string:
         return StringIO object formatted
     """
     out = StringIO()
-    template.seek(0) # from the start of the buffer
+    template.seek(0)  # from the start of the buffer
     out.write(LANG_CMT[LANGS[lang]][0] + u'\n')
     for line in template.readlines():
         out.write(LANG_CMT[LANGS[lang]][1] + u' ')
         out.write(line)
     out.write(LANG_CMT[LANGS[lang]][2] + u'\n')
-    template.close() # force garbage collector
+    template.close()  # force garbage collector
     return out
+
 
 def get_suffix(name):
     """Check if file name have valid suffix for formatting.
@@ -161,6 +163,7 @@ def get_suffix(name):
     else:
         return False
 
+
 def main():
 
     def valid_year(string):
@@ -171,28 +174,28 @@ def main():
     parser = argparse.ArgumentParser(description='Generate a license')
 
     parser.add_argument('license', metavar='license', nargs="?", choices=LICENSES,
-                       help='the license to generate, one of: %s' % ", ".join(LICENSES))
+                        help='the license to generate, one of: %s' % ", ".join(LICENSES))
     parser.add_argument('--header', dest='header', action="store_true",
-                       help='generate source file header for specified license')
+                        help='generate source file header for specified license')
     parser.add_argument('-o', '--org', dest='organization', default=guess_organization(),
-                       help='organization, defaults to .gitconfig or os.environ["USER"]')
+                        help='organization, defaults to .gitconfig or os.environ["USER"]')
     parser.add_argument('-p', '--proj', dest='project', default=os.getcwd().split(os.sep)[-1],
-                       help='name of project, defaults to name of current directory')
+                        help='name of project, defaults to name of current directory')
     parser.add_argument('-t', '--template', dest='template_path',
-                       help='path to license template file')
+                        help='path to license template file')
     parser.add_argument('-y', '--year', dest='year', type=valid_year,
-                       default="%i" % datetime.date.today().year,
-                       help='copyright year')
+                        default="%i" % datetime.date.today().year,
+                        help='copyright year')
     parser.add_argument('-l', '--language', dest='language', default='txt',
-                       help='format output for language source file, one of: %s [default is not formatted (txt)]' % ", ".join(LANGS.keys()))
+                        help='format output for language source file, one of: %s [default is not formatted (txt)]' % ", ".join(LANGS.keys()))
     parser.add_argument('-f', '--file', dest='ofile', default='stdout',
-                       help='Name of the output source file (with -l, extension can be ommitted)')
+                        help='Name of the output source file (with -l, extension can be ommitted)')
     parser.add_argument('--vars', dest='list_vars', action="store_true",
-                       help='list template variables for specified license')
+                        help='list template variables for specified license')
     parser.add_argument('--licenses', dest='list_licenses', action="store_true",
-                       help='list available license templates and their parameters')
+                        help='list available license templates and their parameters')
     parser.add_argument('--languages', dest='list_languages', action="store_true",
-                       help='list available source code formatting languages')
+                        help='list available source code formatting languages')
 
     args = parser.parse_args()
 
@@ -204,11 +207,11 @@ def main():
 
     lang = args.language
     if lang not in LANGS.keys():
-      sys.stderr.write("I do not know about a language ending with "
-                       "extension %s.\n"
-                       "Please send a pull request adding this language to\n"
-                       "https://github.com/licenses/lice. Thanks!\n" % lang)
-      sys.exit(1)
+        sys.stderr.write("I do not know about a language ending with "
+                         "extension %s.\n"
+                         "Please send a pull request adding this language to\n"
+                         "https://github.com/licenses/lice. Thanks!\n" % lang)
+        sys.exit(1)
 
     # generate header if requested
 
@@ -227,7 +230,7 @@ def main():
         out = format_license(content, lang)
         out.seek(0)
         sys.stdout.write(out.getvalue())
-        out.close() # free content memory (paranoic memory stuff)
+        out.close()  # free content memory (paranoic memory stuff)
         sys.exit(0)
 
     # list template vars if requested
@@ -284,9 +287,9 @@ def main():
         ext = get_suffix(args.ofile)
         if ext:
             output = args.ofile
-            out = format_license(content, ext) # format licese by file suffix
+            out = format_license(content, ext)  # format licese by file suffix
         else:
-            if (lang != None):
+            if (lang is not None):
                 output = "%s.%s" % (args.ofile, lang)
             else:
                 output = "%s" % args.ofile
@@ -301,7 +304,7 @@ def main():
         out = format_license(content, lang)
         out.seek(0)
         sys.stdout.write(out.getvalue())
-    out.close() # free content memory (paranoic memory stuff)
+    out.close()  # free content memory (paranoic memory stuff)
 
 if __name__ == "__main__":
     main()
