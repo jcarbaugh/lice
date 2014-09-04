@@ -19,6 +19,7 @@ class TestPaths(unittest.TestCase):
         self.assertEqual(clean_path("$HOME"), os.environ["HOME"])
         self.assertEqual(clean_path("~"), os.environ["HOME"])
 
+
 class TestTemplates(unittest.TestCase):
 
     def test_file_template(self):
@@ -61,7 +62,7 @@ class TestTemplates(unittest.TestCase):
             content = content.replace(u'{{ organization }}', context["organization"])
 
             self.assertEqual(content, generate_license(template, context).getvalue())
-            template.close() # discard memory
+            template.close()  # discard memory
 
     def test_license_header(self):
 
@@ -83,7 +84,7 @@ class TestTemplates(unittest.TestCase):
                 content = content.replace(u'{{ organization }}', context["organization"])
 
                 self.assertEqual(content, generate_license(template, context).getvalue())
-                template.close() # discard memory
+                template.close()  # discard memory
 
             except IOError:
                 pass  # it's okay to not find templates
