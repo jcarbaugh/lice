@@ -70,6 +70,7 @@ LANGS = {
     "scm": "lisp",
     "sh": "unix",
     "txt": "text",
+    "rs": "rust",
 }
 
 LANG_CMT = {
@@ -87,6 +88,7 @@ LANG_CMT = {
     "ruby": [u'=begin', u'', u'=end'],
     "text": [u'', u'', u''],
     "unix": [u'', u'#', u''],
+    "rust": [u'', u'//' u''],
 }
 
 
