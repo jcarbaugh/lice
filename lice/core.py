@@ -183,11 +183,12 @@ def format_license(template, lang):
         lang = 'txt'
     out = StringIO()
     template.seek(0)  # from the start of the buffer
-    out.write(LANG_CMT[LANGS[lang]][0] + u'\n')
     for line in template.readlines():
-        out.write(LANG_CMT[LANGS[lang]][1] + u' ')
+        if lang == 'txt':
+            out.write(LANG_CMT[LANGS[lang]][1])
+        else:
+            out.write(LANG_CMT[LANGS[lang]][1] + u' ')
         out.write(line)
-    out.write(LANG_CMT[LANGS[lang]][2] + u'\n')
     template.close()  # force garbage collector
     return out
 
